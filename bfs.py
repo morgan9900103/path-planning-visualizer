@@ -3,7 +3,7 @@ from queue import Queue
 
 WIDTH = 800
 WIN = pygame.display.set_mode((WIDTH, WIDTH))
-pygame.display.set_caption("A* Path Finding Algorithm")
+pygame.display.set_caption("BFS Path Finding Algorithm")
 
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
@@ -97,6 +97,39 @@ def reconstruct_path(came_from, current, draw):
 
 def algorithm(draw, grid, start, goal):
     # TODO: implement BFS
+    count = 0
+    came_from = {}
+    open_set = Queue()
+    open_set.put((0, start))
+    g_score = {node: float("inf") for row in grid for node in row}
+    g_score[start] = 0
+    discovered = {start}
+
+    movements = [[-1, 0], [0, -1], [1, 0], [0, -1]]
+
+    while not open_set.empty():
+        current = open_set.get()[1]
+        if current == goal:
+            reconstruct_path(came_from, goal, draw)
+            start.make_start()
+            goal.make_goal()
+            return True
+
+        for neighbor in current.neighbor:
+            temp_g_score = g_score[current] + 1
+            if temp_g_score < g_score[neighbor]:
+                came_from[neighbor] = current
+                g_score[neighbor] = temp_g_score
+                if neighbor not in discovered:
+                    count += 1
+                    open_set.put((g_score[neighbor], neighbor))
+                    discovered.add(neighbor)
+                    neighbor.make_open()
+
+        draw()
+
+        if current != start:
+            current.make_closed()
 
     return False
 
